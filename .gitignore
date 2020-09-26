@@ -1,3 +1,8 @@
+data/CROHME
+data/crohme_2.csv
+data/crohme.csv
+tmp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

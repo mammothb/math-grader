@@ -19,6 +19,8 @@ class EquationExtractor:
     """
 
     min_equation_box_area = 30000
+    num_equations = 5
+    num_rectangle_vertices = 4
 
     def __init__(self):
         self.annotated_image = None
@@ -51,7 +53,7 @@ class EquationExtractor:
             approx = approximate_contour(contour)
             # If the approximated polygon has 4 vertices, we take it to
             # be the worksheet and return early
-            if len(approx) == 4:
+            if len(approx) == self.num_rectangle_vertices:
                 target = approx
                 break
 
@@ -92,19 +94,20 @@ class EquationExtractor:
             approx = approximate_contour(contour)
             # Only select 4 sided contours above a certain area
             if (
-                len(approx) == 4
+                len(approx) == self.num_rectangle_vertices
                 and cv2.contourArea(approx) >= self.min_equation_box_area
             ):
                 if not targets:
                     targets.append(approx)
                 elif not any(has_intersection(target, approx) for target in targets):
                     targets.append(approx)
-            if len(targets) == 5:
+            if len(targets) == self.num_equations:
                 break
         # Sort contours by y-coordinate
         targets = sorted(targets, key=lambda c: c[0][0][1])
         equations = []
         for target in targets:
+            target = convert_to_rectangle(target)
             transformation_matrix = get_perspective_transform(target, 800, 100)
             equations.append(
                 cv2.warpPerspective(
@@ -238,6 +241,26 @@ def get_perspective_transform(contour, x, y):
     points = np.float32([[0, 0], [x, 0], [x, y], [0, y]])
 
     return cv2.getPerspectiveTransform(rect, points)
+
+
+def convert_to_rectangle(contour):
+    """Return the bounding rectangle for the provided contour
+
+    Args:
+        contour (np.ndarray of int): Coordinates of a contour
+
+    Returns:
+        np.ndarray of int: The bounding rectangle of the input contour
+    """
+    rect = cv2.boundingRect(contour)
+    return np.array(
+        [
+            [[rect[0] + rect[2], rect[1]]],
+            [[rect[0] + rect[2], rect[1] + rect[3]]],
+            [[rect[0], rect[1] + rect[3]]],
+            [[rect[0], rect[1]]],
+        ]
+    )
 
 
 def annotate_image(image, contour):

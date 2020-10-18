@@ -18,7 +18,12 @@ install:
   - conda env update --file conda.yml --name test
   - source activate test
 
-script:
-  - pytest -x tests/
-  - pytest --cov=src tests/
-  - codecov
+jobs:
+  include:
+    - stage: test
+      script:
+        - pytest -x tests/
+    - stage: coverage
+      script:
+        - pytest --cov=src tests/
+        - codecov

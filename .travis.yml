@@ -14,13 +14,16 @@ install:
 
 jobs:
   include:
-    - os: linux
+    - stage: test
+      os: linux
       dist: xenial
       python: 3.6.9
-    - stage: test
       script:
         - pytest -x tests/
     - stage: coverage
+      os: linux
+      dist: xenial
+      python: 3.6.9
       script:
         - pytest --cov=src tests/
         - codecov

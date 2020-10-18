@@ -20,3 +20,5 @@ install:
 
 script:
   - pytest -x tests/
+  - pytest --cov=src tests/
+  - codecov

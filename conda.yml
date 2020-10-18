@@ -1,8 +1,11 @@
 channels:
   - defaults
+  - conda-forge
 dependencies:
   - pip=20.2.2
+  - codecov=2.1.10
   - pytest=6.1.1
+  - pytest-cov=2.10.1 
   - pip:
     - numpy==1.18.5
     - opencv-python==4.4.0.42

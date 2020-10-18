@@ -1,11 +1,5 @@
 language: python
 
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      python: 3.6.9
-
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
@@ -18,5 +12,18 @@ install:
   - conda env update --file conda.yml --name test
   - source activate test
 
-script:
-  - pytest -x tests/
+jobs:
+  include:
+    - stage: test
+      os: linux
+      dist: xenial
+      python: 3.6.9
+      script:
+        - pytest -x tests/
+    - stage: coverage
+      os: linux
+      dist: xenial
+      python: 3.6.9
+      script:
+        - pytest --cov=src tests/
+        - codecov

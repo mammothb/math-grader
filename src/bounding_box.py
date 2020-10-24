@@ -6,6 +6,18 @@ import numpy as np
 
 
 def default_preprocessor(threshold=0.875, invert=True, n_dilation_iter=2):
+    """Default image preprocessing function to enhance the bounding box
+    detection performance.
+
+    Args:
+        threshold (float, optional): The threshold value used to
+            convert the input image to binary. Defaults to 0.875.
+        invert (bool, optional): Flag to determine whether to use
+            THRESH_BINARY_INV or THRESH_BINARY. Defaults to True.
+        n_dilation_iter (int, optional): Number of iterations to
+            perform the dilation operation. Defaults to 2.
+    """
+
     def processor_func(image):
         _, out = cv2.threshold(
             image,
@@ -21,20 +33,39 @@ def default_preprocessor(threshold=0.875, invert=True, n_dilation_iter=2):
     return processor_func
 
 
-def default_postprocessor(y_stack_threshold=0.5):
+def default_postprocessor(threshold=0.5):
+    """Default post processing function to remove overlapped bounding
+    boxes
+
+    Args:
+        threshold (float, optional): Threshold of the amount of
+            horizontal overlap for the two bounding boxes to be
+            considered as "vertically stacked". Defaults to 0.5.
+    """
+
     def processor_func(boxes):
         old_boxes = boxes
-        new_boxes = merge_y_stacked_bounding_boxes(boxes, y_stack_threshold)
+        new_boxes = merge_y_stacked_bounding_boxes(boxes, threshold)
         while len(new_boxes) != len(old_boxes):
             old_boxes = new_boxes
-            new_boxes = merge_y_stacked_bounding_boxes(new_boxes, y_stack_threshold)
+            new_boxes = merge_y_stacked_bounding_boxes(new_boxes, threshold)
         return new_boxes
 
     return processor_func
 
 
-# From https://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/
 def non_max_suppression(boxes, threshold):
+    """An optimized implementation of the non-maximum suppression
+    algorithm.
+    Adapted from: https://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/
+
+    Args:
+        boxes (np.ndarray of int): Array of bounding box coordinates
+        threshold (float): Threshold of area overlap
+
+    Returns:
+        list of np.ndarray of int: List of bounding box coordinates
+    """
     if len(boxes) == 0:
         return []
     if boxes.dtype.kind == "i":
@@ -55,8 +86,9 @@ def non_max_suppression(boxes, threshold):
         last = len(idxs) - 1
         i = idxs[last]
         pick.append(i)
-        # find the largest coordinates for the start of the bounding box and
-        # the smallest coordinates for the end of the bounding box
+        # find the largest coordinates for the start of the bounding
+        # box and the smallest coordinates for the end of the bounding
+        # box
         xx1 = np.maximum(x1[i], x1[idxs[:last]])
         yy1 = np.maximum(y1[i], y1[idxs[:last]])
         xx2 = np.minimum(x2[i], x2[idxs[:last]])
@@ -74,6 +106,16 @@ def non_max_suppression(boxes, threshold):
 
 
 def merge_boxes(box1, box2):
+    """Merge boxes by creating the smallest box that can bound both
+    input boxes
+
+    Args:
+        box1 (np.ndarray of int): The first input box
+        box2 (np.ndarray of int): The second input box
+
+    Returns:
+        tuple of int: The [left, top, width, height] of the merged box
+    """
     left = min(box1[0], box2[0])
     right = max(box1[0] + box1[2], box2[0] + box2[2])
     top = min(box1[1], box2[1])
@@ -82,6 +124,19 @@ def merge_boxes(box1, box2):
 
 
 def merge_y_stacked_bounding_boxes(boxes, threshold):
+    """Merge vertically stacked boxes. Multiple bounding boxes will be
+    detected for symbols such as "=" and "div", this function will
+    create a merged (larger) bounding box which will bound the whole
+    symbol.
+
+    Args:
+        boxes (list of np.ndarray of int): List of bounding boxes
+        threshold (float): Threshold for horizontal overlap for the
+            boxes to be considered to be "vertically stacked"
+
+    Returns:
+        list of np.ndarray of int: List of bounding box coordinates
+    """
     merge_pairs = set()
     for idx1, idx2 in permutations(range(len(boxes)), 2):
         box1, box2 = boxes[idx1], boxes[idx2]
@@ -99,6 +154,21 @@ def merge_y_stacked_bounding_boxes(boxes, threshold):
 def get_bounding_box(
     image, preprocessor=default_preprocessor(), postprocessor=default_postprocessor()
 ):
+    """Get per character bounding boxes from the given image
+
+    Args:
+        image (np.ndarray of int): The input image
+        preprocessor (function, optional): The preprocessing function
+            to be applied to the input image. Defaults to
+            default_preprocessor().
+        postprocessor (function, optional): The postprocessing function
+            to be applied on the generated bounding boxes. Defaults to
+            default_postprocessor().
+
+    Returns:
+        list of np.ndarray of int: A list of the bounding boxes
+            detected from the image
+    """
     if preprocessor:
         image = preprocessor(image)
     contours, hierarchy = cv2.findContours(

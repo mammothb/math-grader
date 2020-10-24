@@ -1,5 +1,4 @@
 import glob
-import os
 import random
 
 import numpy as np
@@ -15,7 +14,7 @@ ACCEPTED_FORMATS = set(["jpg"])
 
 class EquationGenerator:
     def __init__(self, data_dir, output_size, char_spacing=0):
-        self.char_filename_map = dict()
+        self.char_path_map = dict()
         self.data_dir = data_dir
         self.output_size = output_size
         self.char_spacing = char_spacing
@@ -23,18 +22,14 @@ class EquationGenerator:
 
     def load_filenames(self):
         for char in ALLOWED_CHARS.values():
-            subdir = os.path.join(self.data_dir, char)
+            subdir = self.data_dir / char
             image_paths = []
             for ext in ACCEPTED_FORMATS:
-                image_paths.extend(glob.glob(os.path.join(subdir, f"*.{ext}")))
-            self.char_filename_map[char] = image_paths
+                image_paths.extend(glob.glob(str(subdir / f"*.{ext}")))
+            self.char_path_map[char] = image_paths
 
     def generate_character(self, char):
-        image_path = os.path.join(
-            self.data_dir,
-            ALLOWED_CHARS[char],
-            random.choice(self.char_filename_map[ALLOWED_CHARS[char]]),
-        )
+        image_path = random.choice(self.char_path_map[ALLOWED_CHARS[char]])
         return Image.open(image_path)
 
     def generate_equation(self, equation):

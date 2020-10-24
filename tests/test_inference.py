@@ -48,7 +48,7 @@ def test_parse_equation():
         Path.cwd() / "data" / "example" / "5" / "5_example.jpg",
         Path.cwd() / "data" / "example" / "-" / "-_example.jpg",
         Path.cwd() / "data" / "example" / "3" / "3_example.jpg",
-        Path.cwd() / "data" / "example" / "=" / "=_example.jpg",
+        Path.cwd() / "data" / "cropped" / "=_cropped.jpg",
         Path.cwd() / "data" / "example" / "2" / "2_example.jpg",
     ]
     prediction = parse_equation(image_paths)
@@ -62,3 +62,8 @@ def test_mark_equations():
 
     wrong_equations = ["2+2=5", "1+3", "1/0=0"]
     assert not any(mark_equations(wrong_equations)), "Failed to mark wrong equations"
+
+    forbidden_equations = ["print('hello world')=0"]
+    assert not any(
+        mark_equations(forbidden_equations)
+    ), "Failed to mark forbidden equations"

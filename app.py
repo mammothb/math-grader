@@ -24,10 +24,7 @@ st.set_option("deprecation.showfileUploaderEncoding", False)
 
 def main():
     # Render the readme as markdown using st.markdown.
-    # readme_text = st.markdown(get_file_content_as_string("INSTRUCTIONS.md"))
-    readme_text = st.markdown(
-        get_file_content_as_string(Path.cwd() / "INSTRUCTIONS.md")
-    )
+    readme_text = st.markdown(get_file_content_as_string("INSTRUCTIONS.md"))
 
     # Once we have the dependencies, add a selector for the app mode on the sidebar.
     st.sidebar.title("What to do")

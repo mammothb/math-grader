@@ -8,9 +8,14 @@ Automate marking of (simple) math equations on homework submitted
 # Contributors
 **AIAP Batch 6**
 
-Mentor: adsf
+Mentor: **Ng Lee Ping**
 
-Members: asdf
+Members:
+
+- Heng Kwan Wee
+- Li Yier
+- Mok Kay Yong
+- Theodore Lee**
 
 # Repository
 [GitHub](https://github.com/mammothb/math-grader)

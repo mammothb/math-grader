@@ -92,3 +92,11 @@ def rectify(contour):
     contour_reordered[3] = contour[np.argmax(diff)]
 
     return contour_reordered
+
+def trim_and_otsu_threshold(image, trim_proportion=0.08):
+    height, width = image.shape
+    trim = int(min(trim_proportion * height, trim_proportion * width))
+    image = image[trim : height - 2 * trim, trim : width - 2 * trim]
+    out = cv2.GaussianBlur(image, (7, 7), 0)
+    _, out = cv2.threshold(out, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return out

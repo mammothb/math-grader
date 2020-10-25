@@ -12,6 +12,7 @@ def test_equation_extractor_constructor():
 
     assert extractor.annotated_image is None, "annotated_image not declared"
     assert extractor.annotated_document is None, "annotated_document not declared"
+    assert extractor.unannotated_document is None, "unannotated_document not declared"
 
 
 def test_equation_extractor_extract_document():
@@ -37,9 +38,10 @@ def test_equation_extractor_extract_document():
 
 def test_equation_extractor_extract_equations():
     extractor = EquationExtractor()
-    equations = extractor.extract_equations(IMAGE_PATH)
+    equations, targets = extractor.extract_equations(IMAGE_PATH)
 
     assert isinstance(equations, list), "Wrong return type"
+    assert isinstance(targets, list), "Wrong return type"
     assert all(
         isinstance(equation, np.ndarray) for equation in equations
     ), "Wrong return element type"
@@ -61,3 +63,15 @@ def test_equation_extractor_extract_equations():
         800,
         3,
     ), "Wrong annotated_document shape"
+
+    assert isinstance(
+        extractor.unannotated_document, np.ndarray
+    ), "Wrong unannotated_document type"
+    assert (
+        extractor.unannotated_document.dtype == np.uint8
+    ), "Wrong unannotated_document data type"
+    assert extractor.unannotated_document.shape == (
+        800,
+        800,
+        3,
+    ), "Wrong unannotated_document shape"

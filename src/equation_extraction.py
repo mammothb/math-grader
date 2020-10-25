@@ -7,7 +7,6 @@ from src.utils.geometric import (
     convert_to_rectangle,
     get_perspective_transform,
     has_intersection,
-    rectify,
 )
 from src.utils.structural import (
     approximate_contour,
@@ -37,6 +36,7 @@ class EquationExtractor:
     def __init__(self):
         self.annotated_image = None
         self.annotated_document = None
+        self.unannotated_document = None
 
     def extract_document(self, path):
         """Extract the worksheet from a photo/scan containing the
@@ -90,6 +90,7 @@ class EquationExtractor:
         """
         document = self.extract_document(path)
         self.annotated_document = document.copy()
+        self.unannotated_document = document.copy()
         document_edged = get_edged_image(document, (3, 3), (0, 100))
 
         # dilate images to thicken the equation box lines for easier
@@ -117,9 +118,10 @@ class EquationExtractor:
                 break
         # Sort contours by y-coordinate
         targets = sorted(targets, key=lambda c: c[0][0][1])
+        targets = list(map(convert_to_rectangle, targets))
         equations = []
         for target in targets:
-            target = convert_to_rectangle(target)
+            # target = convert_to_rectangle(target)
             transformation_matrix = get_perspective_transform(target, 800, 100)
             equations.append(
                 cv2.warpPerspective(
@@ -128,4 +130,4 @@ class EquationExtractor:
             )
             annotate_image(self.annotated_document, target)
 
-        return equations
+        return equations, targets

@@ -11,3 +11,10 @@ def annotate_image(image, contour):
         contour (np.ndarray of float): Coordinates of the contour
     """
     cv2.drawContours(image, [contour], 0, (0, 255, 0), 2)
+
+def labeled_annotate_image(image, contours, labels):
+    for contour, label in zip(contours, labels):
+        if label:
+            cv2.drawContours(image, [contour], 0, (0, 255, 0), 2)
+        else:
+            cv2.drawContours(image, [contour], 0, (255, 0, 0), 2)

@@ -9,7 +9,7 @@ import tensorflow as tf
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("inference")
+LOG = logging.getLogger("inference")
 
 CHARS = ["+", "-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "=", "/", "*"]
 
@@ -65,7 +65,7 @@ def load_model():
         "mnist_symbols_imbalance_993.h5",
     )
     model = tf.keras.models.load_model(model_path)
-    logger.info("Loaded model")
+    LOG.info("Loaded model")
     return model
 
 
@@ -156,6 +156,7 @@ def mark_equations(equations):
     answers = []
     for equation in equations:
         try:
+            LOG.info("Parsed equation: %s", equation)
             lhs, rhs = equation.split("=")
             l_tree = ast.parse(lhs, mode="eval")
             r_tree = ast.parse(rhs, mode="eval")

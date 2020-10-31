@@ -10,6 +10,20 @@ from src.inference import (
     resize_image,
 )
 
+DST_DIR = Path.cwd() / "dependency"
+DST_DIR.mkdir(parents=True, exist_ok=True)
+with open(DST_DIR / "model_weights.h5", "wb") as output_file:
+    with urllib.request.urlopen(
+        "https://github.com/mammothb/math-grader/"
+        "raw/master/model/mnist_symbols_imbalance_993.h5"
+    ) as response:
+        MEGABYTES = 2.0 ** 20.0
+        while True:
+            data = response.read(8192)
+            if not data:
+                break
+            output_file.write(data)
+
 
 def test_resize_image():
     image_path = Path.cwd() / "data" / "example" / "-" / "-_example.jpg"

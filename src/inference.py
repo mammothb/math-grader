@@ -59,11 +59,7 @@ def convert_image_to_tensor(img):
 
 
 def load_model():
-    model_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "model",
-        "mnist_symbols_imbalance_993.h5",
-    )
+    model_path = Path.cwd() / "dependency" / "model_weights.h5"
     model = tf.keras.models.load_model(model_path)
     LOG.info("Loaded model")
     return model

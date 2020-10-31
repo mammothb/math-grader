@@ -15,7 +15,7 @@ Members:
 - Heng Kwan Wee
 - Li Yier
 - Mok Kay Yong
-- Theodore Lee**
+- Theodore Lee
 
 # Repository
 [GitHub](https://github.com/mammothb/math-grader)

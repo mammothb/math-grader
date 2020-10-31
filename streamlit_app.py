@@ -1,3 +1,4 @@
+import os.path
 from pathlib import Path
 import urllib
 
@@ -26,6 +27,10 @@ def main():
     # Render the readme as markdown using st.markdown.
     readme_text = st.markdown(get_file_content_as_string("INSTRUCTIONS.md"))
 
+    # Download external dependencies.
+    for filename in DEPENDENCIES.keys():
+        download_file(filename)
+
     # Once we have the dependencies, add a selector for the app mode on the sidebar.
     st.sidebar.title("What to do")
     app_mode = st.sidebar.selectbox(
@@ -37,6 +42,50 @@ def main():
     elif app_mode == "Run the app":
         readme_text.empty()
         run_the_app()
+
+
+# This file downloader demonstrates Streamlit animation.
+def download_file(filename):
+    dst_dir = Path.cwd() / "dependency"
+    dst_dir.mkdir(parents=True, exist_ok=True)
+    file_path = dst_dir / filename
+    # Don't download the file twice. (If possible, verify the download
+    # using the file length.)
+    if file_path.exists():
+        if "size" not in DEPENDENCIES[filename]:
+            return
+        elif file_path.stat().st_size == DEPENDENCIES[filename]["size"]:
+            return
+
+    # These are handles to two visual elements to animate.
+    weights_warning, progress_bar = None, None
+    try:
+        weights_warning = st.warning(f"Downloading {file_path}...")
+        progress_bar = st.progress(0)
+        with open(file_path, "wb") as output_file:
+            with urllib.request.urlopen(DEPENDENCIES[filename]["url"]) as response:
+                length = int(response.info()["Content-Length"])
+                counter = 0.0
+                MEGABYTES = 2.0 ** 20.0
+                while True:
+                    data = response.read(8192)
+                    if not data:
+                        break
+                    counter += len(data)
+                    output_file.write(data)
+
+                    # We perform animation by overwriting the elements.
+                    weights_warning.warning(
+                        f"Downloading {str(file_path)}... "
+                        f"({counter / MEGABYTES:6.2f}/{length / MEGABYTES:6.2f} MB)"
+                    )
+                    progress_bar.progress(min(counter / length, 1.0))
+    # Finally, we remove these visual elements by calling .empty().
+    finally:
+        if weights_warning is not None:
+            weights_warning.empty()
+        if progress_bar is not None:
+            progress_bar.empty()
 
 
 def run_the_app():
@@ -120,6 +169,14 @@ def get_file_content_as_string(path):
     url = f"https://raw.githubusercontent.com/mammothb/math-grader/master/{path}"
     response = urllib.request.urlopen(url)
     return response.read().decode("utf-8")
+
+
+DEPENDENCIES = {
+    "model_weights.h5": {
+        "url": "https://github.com/mammothb/math-grader/raw/master/model/mnist_symbols_imbalance_993.h5",
+        "size": 10728912,
+    },
+}
 
 
 if __name__ == "__main__":

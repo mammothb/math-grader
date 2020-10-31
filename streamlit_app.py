@@ -13,7 +13,7 @@ from src.utils.geometric import trim_and_otsu_threshold
 from src.utils.visualize import labeled_annotate_image
 
 
-st.beta_set_page_config(
+st.set_page_config(
     page_title="Math Grader",
     page_icon=":pencil:",
     layout="centered",

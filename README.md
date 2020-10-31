@@ -9,7 +9,7 @@ I have performed further refinements of the codebase such as:
 - Reorganizing/modularizing various classes and functions
 - Implementing unit tests to achieve 100% code coverage of backend code
 - Set up Travis CI and codecov for code health report
-- Host the app (to be done)
+- Host the app ([link](https://share.streamlit.io/mammothb/math-grader))
 
 ### Problem statement:
 Marking of handwritten math homework can be tedious and laborious, hence it is prone to human error.

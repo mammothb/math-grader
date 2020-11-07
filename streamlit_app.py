@@ -176,6 +176,10 @@ DEPENDENCIES = {
         "url": "https://github.com/mammothb/math-grader/raw/master/model/mnist_symbols_imbalance_993.h5",
         "size": 10728912,
     },
+    "test_image.jpg": {
+        "utl": "https://github.com/mammothb/math-grader/raw/master/data/test_image_1.jpg",
+        "size": 820740,
+    }
 }
 
 

@@ -37,6 +37,7 @@ def resize_image(img_path):
             int(round((big_side - height) / 2, 0)),
         )
         background.paste(img, offset)
+        img = background
     img = ImageOps.invert(img.resize((img_dim, img_dim)))
 
     return img
@@ -77,7 +78,11 @@ def classify_image(img_path, model=None):
     Returns:
         str: The predicted food category
     """
-    img_array = convert_image_to_tensor(resize_image(img_path))
+    img_resize = resize_image(img_path)
+    debug_dir = img_path.parent / "debug"
+    debug_dir.mkdir(parents=True, exist_ok=True)
+    img_resize.save(debug_dir / img_path.name)
+    img_array = convert_image_to_tensor(img_resize)
 
     if model is None:
         model = load_model()

@@ -78,11 +78,7 @@ def classify_image(img_path, model=None):
     Returns:
         str: The predicted food category
     """
-    img_resize = resize_image(img_path)
-    debug_dir = img_path.parent / "debug"
-    debug_dir.mkdir(parents=True, exist_ok=True)
-    img_resize.save(debug_dir / img_path.name)
-    img_array = convert_image_to_tensor(img_resize)
+    img_array = convert_image_to_tensor(resize_image(img_path))
 
     if model is None:
         model = load_model()

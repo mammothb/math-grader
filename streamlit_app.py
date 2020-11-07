@@ -1,5 +1,6 @@
 import os.path
 from pathlib import Path
+import shutil
 import urllib
 
 import numpy as np
@@ -94,22 +95,24 @@ def run_the_app():
     upload_file = st.file_uploader(
         "Upload a math worksheet (.jpg/.png)", type=["jpg", "png"], key="demo"
     )
+    tmp_dir = Path.cwd() / "tmp"
+    tmp_dir.mkdir(exist_ok=True)
+    image_path = tmp_dir / "worksheet.jpg"
     if upload_file is not None:
-        uploaded_image = Image.open(upload_file)
-        st.image(
-            uploaded_image,
-            caption="Uploaded image.",
-            channels="RGB",
-            use_column_width=True,
-        )
-        tmp_dir = Path.cwd() / "tmp"
-        tmp_dir.mkdir(exist_ok=True)
-        image_path = tmp_dir / "worksheet.jpg"
         with open(image_path, "wb") as outfile:
             outfile.write(upload_file.getbuffer())
+    elif st.button("Try a sample image"):
+        shutil.copy(Path.cwd() / "dependency" / "test_image.jpg", image_path)
     else:
         st.warning("Please upload an image.")
         st.stop()
+
+    st.image(
+        Image.open(image_path),
+        caption="Uploaded image.",
+        channels="RGB",
+        use_column_width=True,
+    )
 
     st.markdown("**2) Let's run the model!**")
 
@@ -177,7 +180,7 @@ DEPENDENCIES = {
         "size": 10728912,
     },
     "test_image.jpg": {
-        "utl": "https://github.com/mammothb/math-grader/raw/master/data/test_image_1.jpg",
+        "url": "https://github.com/mammothb/math-grader/raw/master/data/test_image_1.jpg",
         "size": 820740,
     }
 }
